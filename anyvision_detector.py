@@ -367,8 +367,10 @@ if __name__ == "__main__":
         print("working on vid:", args.data_path, "\n\n")
         create_detections(args.data_path, args, two_patches=args.two_patches)
     else:
-        if not os.path.exists(os.path.join(args.bboxs_dir, "bboxs_dir")):
-            os.mkdir(os.path.join(args.bboxs_dir, "bboxs_dir"))
+        #if not os.path.exists(os.path.join(args.bboxs_dir, "bboxs_dir")):
+        #    os.mkdir(os.path.join(args.bboxs_dir, "bboxs_dir"))
+        #args.bboxs_dir = os.path.join(args.bboxs_dir, "bboxs_dir")
+        os.makedirs(os.path.join(args.bboxs_dir, "bboxs_dir"), exist_ok=True)
         args.bboxs_dir = os.path.join(args.bboxs_dir, "bboxs_dir")
 
         if args.create_bbs_video:

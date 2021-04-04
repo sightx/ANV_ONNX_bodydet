@@ -107,9 +107,9 @@ tf2-kdl==0.6.5
 tf2-py==0.6.5
 tf2-ros==0.6.5
 topic-tools==1.14.10
-torch==1.8.0+cu111
+torch==1.8.0
 torchaudio==0.8.0
-torchvision==0.9.0+cu111
+torchvision==0.9.0
 typing-extensions==3.7.4.3
 urdfdom-py==0.4.5
 xacro==1.13.9
