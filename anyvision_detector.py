@@ -291,7 +291,6 @@ def create_detections(data_path, args, two_patches=True):
             height, width = img.shape[0], img.shape[1]
             offset = width - height
             img_to_print = img
-
             first_patch, second_patch = pre_processing_two_patch(img)
             first_ort_inputs = {ort_session.get_inputs()[0].name: first_patch.detach().cpu().numpy()}
             first_ort_outs = ort_session.run(None, first_ort_inputs)
@@ -363,13 +362,14 @@ if __name__ == "__main__":
     args.NMSThreshold = float(args.NMSThreshold)
     args.scoreThreshold = float(args.scoreThreshold)
     isDirectory = os.path.isdir(args.data_path)
+    if args.two_patches ==str(1):
+        args.two_patches = True
+    else:
+        args.two_patches = False
     if isDirectory != True:
         print("working on vid:", args.data_path, "\n\n")
         create_detections(args.data_path, args, two_patches=args.two_patches)
     else:
-        #if not os.path.exists(os.path.join(args.bboxs_dir, "bboxs_dir")):
-        #    os.mkdir(os.path.join(args.bboxs_dir, "bboxs_dir"))
-        #args.bboxs_dir = os.path.join(args.bboxs_dir, "bboxs_dir")
         os.makedirs(os.path.join(args.bboxs_dir, "bboxs_dir"), exist_ok=True)
         args.bboxs_dir = os.path.join(args.bboxs_dir, "bboxs_dir")
 
