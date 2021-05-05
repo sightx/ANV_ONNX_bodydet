@@ -258,10 +258,10 @@ def print_to_file(frame_num, f, bbs):
         for i in range(0, bb_num):
             the_class = 0
             score = bbs[i, 4]
-            X1 = bbs[i, 0].astype("int")
-            Y1 = bbs[i, 1].astype("int")
-            X2 = bbs[i, 2].astype("int")
-            Y2 = bbs[i, 3].astype("int")
+            X1 = bbs[i, 0]
+            Y1 = bbs[i, 1]
+            X2 = bbs[i, 2]
+            Y2 = bbs[i, 3]
             w = X2 - X1
             h = Y2 - Y1
 
@@ -286,6 +286,7 @@ def create_detections(ort_session, data_path, input_dtype, args, two_patches=Tru
 
     count = 1
     while ret and count:
+        #img = cv2.resize(img, dsize=(910, 512), interpolation=cv2.INTER_LINEAR)
         if two_patches:
             height, width = img.shape[0], img.shape[1]
             offset = width - height
@@ -326,7 +327,7 @@ def create_detections(ort_session, data_path, input_dtype, args, two_patches=Tru
     cap.release()
     if args.create_bbs_video:
         video_writer.release()
-    cv2.destroyAllWindows()
+    #cv2.destroyAllWindows()
     f.close()
 
 def parse_args():
@@ -363,6 +364,7 @@ if __name__ == "__main__":
     args = parse_args()
     args.NMSThreshold = float(args.NMSThreshold)
     args.scoreThreshold = float(args.scoreThreshold)
+    args.create_bbs_video = int(args.create_bbs_video)
     isDirectory = os.path.isdir(args.data_path)
     if args.two_patches ==str(1):
         args.two_patches = True
