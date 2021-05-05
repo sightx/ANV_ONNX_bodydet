@@ -272,8 +272,7 @@ def print_to_file(frame_num, f, bbs):
 
         f.write(total_string + "\n")
 
-def create_detections(data_path, args, two_patches=True):
-    ort_session = ort.InferenceSession("detector.onnx")
+def create_detections(ort_session, data_path, input_dtype, args, two_patches=True):
     nms = NmsAnv(args.NMSThreshold)
     cap = cv2.VideoCapture(data_path)
     file_name = os.path.basename(data_path)
@@ -292,11 +291,11 @@ def create_detections(data_path, args, two_patches=True):
             offset = width - height
             img_to_print = img
             first_patch, second_patch = pre_processing_two_patch(img)
-            first_ort_inputs = {ort_session.get_inputs()[0].name: first_patch.detach().cpu().numpy()}
+            first_ort_inputs = {ort_session.get_inputs()[0].name: first_patch.detach().cpu().numpy().astype(input_dtype)}
             first_ort_outs = ort_session.run(None, first_ort_inputs)
             first_boxes_array = post_processing(output=first_ort_outs, a_nScoreThreshold=args.scoreThreshold, width=height, height=height)
 
-            second_ort_inputs = {ort_session.get_inputs()[0].name: second_patch.detach().cpu().numpy()}
+            second_ort_inputs = {ort_session.get_inputs()[0].name: second_patch.detach().cpu().numpy().astype(input_dtype)}
             second_ort_outs = ort_session.run(None, second_ort_inputs)
             second_boxes_array = post_processing(output=second_ort_outs, a_nScoreThreshold=args.scoreThreshold, width=height, height=height, offset=offset)
 
@@ -354,6 +353,9 @@ def parse_args():
     parser.add_argument(
         "--scoreThreshold", help="",
         default=0.1)
+    parser.add_argument(
+        "--fp16", help="Run inference in FP16 mode",
+        default=True)
 
     return parser.parse_args()
 
@@ -366,9 +368,11 @@ if __name__ == "__main__":
         args.two_patches = True
     else:
         args.two_patches = False
+    ort_session = ort.InferenceSession("detector_fp16.onnx" if args.fp16 else "detector.onnx")
+    input_dtype = np.half if args.fp16 else np.float
     if isDirectory != True:
         print("working on vid:", args.data_path, "\n\n")
-        create_detections(args.data_path, args, two_patches=args.two_patches)
+        create_detections(ort_session, args.data_path, input_dtype, args, two_patches=args.two_patches)
     else:
         os.makedirs(os.path.join(args.bboxs_dir, "bboxs_dir"), exist_ok=True)
         args.bboxs_dir = os.path.join(args.bboxs_dir, "bboxs_dir")
@@ -381,7 +385,7 @@ if __name__ == "__main__":
         for r, d, f in os.walk(args.data_path):
             for file in f:
                 print("working on vid:", os.path.join(r, file), "\n\n")
-                create_detections(data_path=os.path.join(r, file), args=args, two_patches=args.two_patches)
+                create_detections(ort_session, data_path=os.path.join(r, file), input_dtype=input_dtype, args=args, two_patches=args.two_patches)
 
 
 
