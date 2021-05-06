@@ -265,7 +265,7 @@ def print_to_file(frame_num, f, bbs):
             w = X2 - X1
             h = Y2 - Y1
 
-            total_string += str(the_class) + "," + str(score) + "," + str(X1 + int(w / 2)) + "," + str(Y1 + int(h / 2)) + "," + str(w) + "," + str(h)
+            total_string += str(the_class) + "," + str(score) + "," + str(X1 + w / 2) + "," + str(Y1 + h / 2) + "," + str(w) + "," + str(h)
 
             if i != bb_num - 1:
                 total_string += " "
