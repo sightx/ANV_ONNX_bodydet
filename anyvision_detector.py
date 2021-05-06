@@ -371,7 +371,7 @@ if __name__ == "__main__":
     else:
         args.two_patches = False
     ort_session = ort.InferenceSession("detector_fp16.onnx" if args.fp16 else "detector.onnx")
-    input_dtype = np.half if args.fp16 else np.float
+    input_dtype = np.half if args.fp16 else np.float32
     if isDirectory != True:
         print("working on vid:", args.data_path, "\n\n")
         create_detections(ort_session, args.data_path, input_dtype, args, two_patches=args.two_patches)
