@@ -315,6 +315,13 @@ def create_detections(ort_session, data_path, input_dtype, args, two_patches=Tru
             boxes_array = post_processing(output=ort_outs, a_nScoreThreshold=args.scoreThreshold, width=width, height=height)
             bb_out = np.array(nms.run(boxes_array))
 
+        # clamp detections
+        if len(bb_out) > 0:
+            bb_out[:, 0] = np.clip(bb_out[:, 0], 0, width)
+            bb_out[:, 1] = np.clip(bb_out[:, 1], 0, height)
+            bb_out[:, 2] = np.clip(bb_out[:, 2], 0, width)
+            bb_out[:, 3] = np.clip(bb_out[:, 3], 0, height)
+
         print_to_file(count, f, bb_out)
         print("frame count: ", count, "number of detections:", len(bb_out))
         plt.close("all")
