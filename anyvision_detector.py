@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import os
 import argparse
-
+import matplotlib.image as mpimg
 
 
 
@@ -274,19 +274,21 @@ def print_to_file(frame_num, f, bbs):
 
 def create_detections(ort_session, data_path, input_dtype, args, two_patches=True):
     nms = NmsAnv(args.NMSThreshold)
-    cap = cv2.VideoCapture(data_path)
+    path, dirs, files = next(os.walk(data_path))
+    image_max_count = len(files)
     file_name = os.path.basename(data_path)
 
     if args.create_bbs_video:
         fourcc = cv2.VideoWriter_fourcc('M', 'J', 'P', 'G')
-        video_writer = cv2.VideoWriter(os.path.join(args.bbs_video_dir, file_name[:-4] + "_with_bboxes.avi"), fourcc, 25.0, (640, 480))
+        video_writer = cv2.VideoWriter(os.path.join(args.bbs_video_dir, file_name + "_with_bboxes.avi"), fourcc, 25.0, (640, 480))
 
-    f = open(os.path.join(args.bboxs_dir, file_name[:-4] + ".txt"), "w")
-    ret, img = cap.read()
+    f = open(os.path.join(args.bboxs_dir, file_name + ".txt"), "w")
 
     count = 1
-    while ret and count:
-        #img = cv2.resize(img, dsize=(910, 512), interpolation=cv2.INTER_LINEAR)
+
+    while count <= image_max_count:
+        img = cv2.imread(data_path + '/' + str(count) + '.png')
+        img = cv2.resize(img, dsize=(910, 512), interpolation=cv2.INTER_LINEAR)
         if two_patches:
             height, width = img.shape[0], img.shape[1]
             offset = width - height
@@ -328,13 +330,11 @@ def create_detections(ort_session, data_path, input_dtype, args, two_patches=Tru
         if args.create_bbs_video:
             data = plot_bb_on_frame(bb_out, img_to_print)
             video_writer.write(data)
-        ret, img = cap.read()
         count += 1
 
-    cap.release()
     if args.create_bbs_video:
         video_writer.release()
-    #cv2.destroyAllWindows()
+
     f.close()
 
 def parse_args():
@@ -392,9 +392,9 @@ if __name__ == "__main__":
             args.bbs_video_dir = os.path.join(args.bbs_video_dir, "bbs_video_dir")
 
         for r, d, f in os.walk(args.data_path):
-            for file in f:
-                print("working on vid:", os.path.join(r, file), "\n\n")
-                create_detections(ort_session, data_path=os.path.join(r, file), input_dtype=input_dtype, args=args, two_patches=args.two_patches)
+            for vid in d:
+                print("working on vid:", os.path.join(r, vid), "\n\n")
+                create_detections(ort_session, data_path=os.path.join(r, vid), input_dtype=input_dtype, args=args, two_patches=args.two_patches)
 
 
 

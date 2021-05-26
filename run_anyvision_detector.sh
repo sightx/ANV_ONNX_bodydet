@@ -6,7 +6,7 @@
 
 #  ------------- path args --------------------------------------------
 # data_path: data path to video or dir
-data_path=/home/nivpekar/projects/data/videos/outdoor2804
+data_path=/home/nivpekar/projects/data/videos_ex/one    #videos/outdoor2804
 # bbs_video_dir: where to create the a videos with bboxes (if create_bbs_video==1)
 bbs_video_dir=./
 # bboxs_dir: where to create the files of the bboxs
@@ -16,7 +16,7 @@ bboxs_dir=./
 # -----------------------------------------------------------------
 
 python anyvision_detector.py --data_path $data_path \
---create_bbs_video 0 \
+--create_bbs_video 1 \
 --bbs_video_dir $bbs_video_dir \
 --bboxs_dir $bboxs_dir \
 --two_patches 1 \
